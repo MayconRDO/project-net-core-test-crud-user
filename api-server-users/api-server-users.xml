@@ -4,20 +4,30 @@
         <name>api-server-users</name>
     </assembly>
     <members>
+        <member name="T:api_server_users.Controllers.UserController">
+            <summary>
+            Controlador do usuário
+            </summary>
+        </member>
+        <member name="M:api_server_users.Controllers.UserController.#ctor(api_server_users.Repositories.Interfaces.IApplicationUserRepository)">
+            <summary>
+            Construtor
+            </summary>
+        </member>
         <member name="M:api_server_users.Controllers.UserController.Get">
             <summary>
             Obter todos os usuários
             </summary>
             <returns>Usuários</returns>
         </member>
-        <member name="M:api_server_users.Controllers.UserController.Get(System.Int32)">
+        <member name="M:api_server_users.Controllers.UserController.Get(System.String)">
             <summary>
             Obter usuário por e-mail
             </summary>
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="M:api_server_users.Controllers.UserController.Add">
+        <member name="M:api_server_users.Controllers.UserController.Add(api_server_users.Models.UserDTO)">
             <summary>
             Cadastrar usuário
             </summary>
@@ -34,6 +44,136 @@
             Deletar usuário por e-mail
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:api_server_users.DataBase.Entities.ApplicationUser">
+            <summary>
+            Objeto usuário
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.ApplicationUser.FullName">
+            <summary>
+            Nome completo do usuário
+            </summary>
+        </member>
+        <member name="T:api_server_users.DataBase.UserContext">
+            <summary>
+            Contexto do Usuário
+            </summary>
+        </member>
+        <member name="M:api_server_users.DataBase.UserContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{api_server_users.DataBase.UserContext})">
+            <summary>
+            Construtor do usuário
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="T:api_server_users.Models.UserDTO">
+            <summary>
+            Objeto de visualização do usuário
+            </summary>
+        </member>
+        <member name="P:api_server_users.Models.UserDTO.Name">
+            <summary>
+            Nome
+            </summary>
+        </member>
+        <member name="P:api_server_users.Models.UserDTO.Email">
+            <summary>
+            Email 
+            </summary>
+        </member>
+        <member name="P:api_server_users.Models.UserDTO.Password">
+            <summary>
+            Senha
+            </summary>
+        </member>
+        <member name="P:api_server_users.Models.UserDTO.PasswordConfirmation">
+            <summary>
+            Confirmação de Senha
+            </summary>
+        </member>
+        <member name="T:api_server_users.Repositories.ApplicationUserRepository">
+            <summary>
+            Repositorio do objeto usuário
+            </summary>
+        </member>
+        <member name="M:api_server_users.Repositories.ApplicationUserRepository.#ctor(Microsoft.AspNetCore.Identity.UserManager{api_server_users.DataBase.Entities.ApplicationUser})">
+            <summary>
+            Construtor
+            </summary>
+        </member>
+        <member name="M:api_server_users.Repositories.ApplicationUserRepository.Get">
+            <summary>
+            Obter todos usuários
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Repositories.ApplicationUserRepository.Get(System.String)">
+            <summary>
+            Obter usuário por email
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Repositories.ApplicationUserRepository.Add(api_server_users.DataBase.Entities.ApplicationUser,System.String)">
+            <summary>
+            Cadastrar usuário
+            </summary>
+            <param name="applicationUser">Objeto do usuário</param>
+            <param name="password">Password do usuário</param>
+        </member>
+        <member name="M:api_server_users.Repositories.ApplicationUserRepository.Update(api_server_users.DataBase.Entities.ApplicationUser)">
+            <summary>
+            Alterar usuário
+            </summary>
+            <param name="applicationUser"></param>
+        </member>
+        <member name="M:api_server_users.Repositories.ApplicationUserRepository.Delete(api_server_users.DataBase.Entities.ApplicationUser)">
+            <summary>
+            Deletar usuário
+            </summary>
+            <param name="applicationUser"></param>
+        </member>
+        <member name="T:api_server_users.Repositories.Interfaces.IApplicationUserRepository">
+            <summary>
+            Interface do objeto usuário
+            </summary>
+        </member>
+        <member name="M:api_server_users.Repositories.Interfaces.IApplicationUserRepository.Get">
+            <summary>
+            Obter todos os usuários
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Repositories.Interfaces.IApplicationUserRepository.Get(System.String)">
+            <summary>
+            Obter usuário por email
+            </summary>
+            <param name="email">Email</param>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Repositories.Interfaces.IApplicationUserRepository.Add(api_server_users.DataBase.Entities.ApplicationUser,System.String)">
+            <summary>
+            Cadastrar usuário
+            </summary>
+            <param name="applicationUser">Objeto usuário</param>
+            <param name="password">Senha</param>
+        </member>
+        <member name="M:api_server_users.Repositories.Interfaces.IApplicationUserRepository.Update(api_server_users.DataBase.Entities.ApplicationUser)">
+            <summary>
+            Alterar usuário
+            </summary>
+            <param name="applicationUser">Objeto do usuário</param>
+        </member>
+        <member name="M:api_server_users.Repositories.Interfaces.IApplicationUserRepository.Delete(api_server_users.DataBase.Entities.ApplicationUser)">
+            <summary>
+            Deletar usuário
+            </summary>
+            <param name="applicationUser">Objeto do usuário</param>
+        </member>
+        <member name="T:api_server_users.Startup">
+            <summary>
+            Classe de inicialização
+            </summary>
         </member>
     </members>
 </doc>

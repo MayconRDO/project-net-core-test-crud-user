@@ -1,16 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using api_server_users.DataBase.Entities;
+using api_server_users.Models;
+using api_server_users.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace api_server_users.Controllers
 {
+    /// <summary>
+    /// Controlador do usuário
+    /// </summary>
     public class UserController : ControllerBase
     {
-        public UserController()
-        {
+        private readonly IApplicationUserRepository _userRepository;
 
+        /// <summary>
+        /// Construtor
+        /// </summary>
+        public UserController(IApplicationUserRepository userRepository)
+        {
+            _userRepository = userRepository;
         }
 
         /// <summary>
@@ -20,7 +29,7 @@ namespace api_server_users.Controllers
         [HttpPost("getAll")]
         public ActionResult Get()
         {
-            return Ok();
+            return Ok(_userRepository.Get());
         }
 
         /// <summary>
@@ -29,9 +38,9 @@ namespace api_server_users.Controllers
         /// <param name="email"></param>
         /// <returns></returns>
         [HttpGet("get")]
-        public ActionResult Get(int email)
+        public ActionResult Get(string email)
         {
-            return Ok();
+            return Ok(_userRepository.Get(email));
         }
 
         /// <summary>
@@ -39,9 +48,39 @@ namespace api_server_users.Controllers
         /// </summary>
         /// <returns>Usuário</returns>
         [HttpPost("add")]
-        public ActionResult Add()
+        public ActionResult Add([FromBody]UserDTO user)
         {
-            return Ok();
+            if (ModelState.IsValid)
+            {
+                ApplicationUser applicationUser = new ApplicationUser()
+                {
+                    FullName = user.Name,
+                    Email = user.Email,
+                    UserName = user.Email
+                };
+
+                var result = _userRepository.Add(applicationUser, user.Password);
+
+                if (!result.Succeeded)
+                {
+                    List<string> errors = new List<string>();
+
+                    foreach (var error in result.Errors)
+                    {
+                        errors.Add(error.Description);
+                    }
+
+                    return UnprocessableEntity(errors);
+                }
+                else
+                {
+                    return Ok(applicationUser);
+                }
+            }
+            else
+            {
+                return UnprocessableEntity(ModelState);
+            }
         }
 
         /// <summary>
@@ -51,7 +90,20 @@ namespace api_server_users.Controllers
         [HttpPut("update")]
         public ActionResult Update()
         {
-            return Ok();
+            if (ModelState.IsValid)
+            {
+                var user = _userRepository.Get("maycon.oliveira@gmail.com");
+
+                if (user == null)
+                {
+                    return NotFound("Usuário não encontrado.");
+                }
+
+                _userRepository.Update(user);
+
+            }
+
+            return Ok("Usuário alterado com sucesso.");
         }
 
         /// <summary>
@@ -61,7 +113,16 @@ namespace api_server_users.Controllers
         [HttpDelete("delete")]
         public ActionResult Delete()
         {
-            return Ok();
+            var user = _userRepository.Get("maycon.oliveira@gmail.com");
+
+            if (user == null)
+            {
+                return NotFound("Usuário não encontrado.");
+            }
+
+            _userRepository.Delete(user);
+
+            return Ok("Usuário deletado com sucesso.");
         }
     }
 }
