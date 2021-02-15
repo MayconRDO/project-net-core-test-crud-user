@@ -126,13 +126,62 @@ namespace api_server_users.Controllers
         }
 
         /// <summary>
+        /// Alterar senha
+        /// </summary>
+        /// <param name="userDTO">Modelo de input de alteração de senha</param>
+        /// <returns></returns>
+        [HttpPut("changePassword")]
+        public ActionResult ChangePassword([FromBody]UserChangePasswordDTO userDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = _userRepository.Get(userDTO.Email);
+
+                if (user == null)
+                {
+                    return NotFound("Usuário não encontrado.");
+                }
+
+                if (!_userRepository.CheckPassword(user, userDTO.PasswordCurrent))
+                {
+                    return NotFound("Senha atual inválida.");
+                }
+
+                user.PasswordHash = userDTO.PasswordNew;
+
+                var result = _userRepository.ChangePassword(user, userDTO.PasswordNew);
+
+                if (!result.Succeeded)
+                {
+                    List<string> errors = new List<string>();
+
+                    foreach (var error in result.Errors)
+                    {
+                        errors.Add(error.Description);
+                    }
+
+                    return UnprocessableEntity(errors);
+                }
+                else
+                {
+                    return Ok("Senha alterada com sucesso.");
+                }
+
+            }
+            else
+            {
+                return UnprocessableEntity(ModelState);
+            }
+        }
+
+        /// <summary>
         /// Deletar usuário por e-mail
         /// </summary>
         /// <returns></returns>
         [HttpDelete("delete")]
-        public ActionResult Delete()
+        public ActionResult Delete(string email)
         {
-            var user = _userRepository.Get("maycon.oliveira@gmail.com");
+            var user = _userRepository.Get(email);
 
             if (user == null)
             {

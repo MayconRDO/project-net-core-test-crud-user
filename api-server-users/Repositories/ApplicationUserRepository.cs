@@ -60,17 +60,31 @@ namespace api_server_users.Repositories
         public IdentityResult Update(ApplicationUser applicationUser)
         {
             return _userManager.UpdateAsync(applicationUser).Result;
+        }
 
-            //if (!result.Succeeded)
-            //{
-            //    StringBuilder sb = new StringBuilder();
-            //    foreach (var error in result.Errors)
-            //    {
-            //        sb.Append(error.Description);
-            //    }
+        /// <summary>
+        /// Alterar senha do usuário
+        /// </summary>
+        /// <param name="applicationUser">Objeto do usuário</param>
+        /// <param name="newPassword">Senha nova</param>
+        /// <returns></returns>
+        public IdentityResult ChangePassword(ApplicationUser applicationUser, string newPassword)
+        {
+            var password = _userManager.PasswordHasher.HashPassword(applicationUser, newPassword);
+            applicationUser.PasswordHash = password;
 
-            //    throw new Exception($"Usuário não alterado! {sb.ToString()}");
-            //}
+            return _userManager.UpdateAsync(applicationUser).Result;
+        }
+
+        /// <summary>
+        /// Verificar password
+        /// </summary>
+        /// <param name="applicationUser">Objeto do usuário</param>
+        /// <param name="password">Senha</param>
+        /// <returns></returns>
+        public bool CheckPassword(ApplicationUser applicationUser, string password)
+        {
+            return _userManager.CheckPasswordAsync(applicationUser, password).Result;
         }
 
         /// <summary>
@@ -92,5 +106,6 @@ namespace api_server_users.Repositories
                 throw new Exception($"Usuário não deletado! {sb.ToString()}");
             }
         }
+
     }
 }

@@ -17,7 +17,7 @@ namespace api_server_users.Repositories.Interfaces
         /// </summary>
         /// <returns></returns>
         List<ApplicationUser> Get();
-        
+
         /// <summary>
         /// Obter usuário por email
         /// </summary>
@@ -37,7 +37,23 @@ namespace api_server_users.Repositories.Interfaces
         /// </summary>
         /// <param name="applicationUser">Objeto do usuário</param>
         IdentityResult Update(ApplicationUser applicationUser);
-        
+
+        /// <summary>
+        /// Alterar senha do usuário
+        /// </summary>
+        /// <param name="applicationUser">Objeto do usuário</param>
+        /// <param name="newPassword">Senha nova</param>
+        /// <returns>IdentityResult</returns>
+        IdentityResult ChangePassword(ApplicationUser applicationUser, string newPassword);
+
+        /// <summary>
+        /// Verificar password
+        /// </summary>
+        /// <param name="applicationUser">Objeto do usuário</param>
+        /// <param name="password">Senha</param>
+        /// <returns>bool</returns>
+        bool CheckPassword(ApplicationUser applicationUser, string password);
+
         /// <summary>
         /// Deletar usuário
         /// </summary>
