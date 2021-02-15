@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using api_server_users.DataBase;
+using api_server_users.DataBase.Entities;
 using api_server_users.Repositories;
 using api_server_users.Repositories.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
@@ -24,6 +28,15 @@ namespace api_server_users
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<UserContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddDbContext<UserContext>(op =>
+            {
+                op.UseSqlite("Data Source=Database\\Users.db");
+            });
 
             #region Swagger
             services.AddSwaggerGen(conf =>
@@ -43,7 +56,7 @@ namespace api_server_users
             });
             #endregion
 
-            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

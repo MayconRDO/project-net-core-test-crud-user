@@ -10,6 +10,8 @@ namespace api_server_users.Controllers
     /// <summary>
     /// Controlador do usuário
     /// </summary>
+    [Route("api/[controller]")]
+    [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IApplicationUserRepository _userRepository;
@@ -26,7 +28,7 @@ namespace api_server_users.Controllers
         /// Obter todos os usuários
         /// </summary>
         /// <returns>Usuários</returns>
-        [HttpPost("getAll")]
+        [HttpGet("getAll")]
         public ActionResult Get()
         {
             return Ok(_userRepository.Get());
