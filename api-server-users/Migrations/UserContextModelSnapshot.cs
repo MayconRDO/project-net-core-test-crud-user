@@ -175,6 +175,32 @@ namespace api_server_users.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("api_server_users.DataBase.Entities.Token", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("DateCreated");
+
+                    b.Property<DateTime?>("DateModifield");
+
+                    b.Property<DateTime>("ExpirationRefreshToken");
+
+                    b.Property<DateTime>("ExpirationToken");
+
+                    b.Property<string>("RefreshToken");
+
+                    b.Property<bool>("Used");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Tokens");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -218,6 +244,13 @@ namespace api_server_users.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("api_server_users.DataBase.Entities.Token", b =>
+                {
+                    b.HasOne("api_server_users.DataBase.Entities.ApplicationUser", "User")
+                        .WithMany("Tokens")
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

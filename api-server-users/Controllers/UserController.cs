@@ -1,9 +1,16 @@
 ﻿using api_server_users.DataBase.Entities;
 using api_server_users.Models;
 using api_server_users.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace api_server_users.Controllers
 {
@@ -15,46 +22,15 @@ namespace api_server_users.Controllers
     public class UserController : ControllerBase
     {
         private readonly IApplicationUserRepository _userRepository;
+        private readonly ITokenRepository _tokenRepository;
 
         /// <summary>
         /// Construtor
         /// </summary>
-        public UserController(IApplicationUserRepository userRepository)
+        public UserController(IApplicationUserRepository userRepository, ITokenRepository tokenRepository)
         {
             _userRepository = userRepository;
-        }
-
-        /// <summary>
-        /// Obter todos os usuários
-        /// </summary>
-        /// <returns>Usuários</returns>
-        [HttpGet("getAll")]
-        public ActionResult Get()
-        {
-            var users = _userRepository.Get();
-
-            if (users.Count == 0)
-            {
-                return NotFound("Não existem usuários cadastrados.");
-            }
-            return Ok(users);
-        }
-
-        /// <summary>
-        /// Obter usuário por e-mail
-        /// </summary>
-        /// <param name="email"></param>
-        /// <returns></returns>
-        [HttpGet("get")]
-        public ActionResult Get(string email)
-        {
-            var user = _userRepository.Get(email);
-
-            if (user == null)
-            {
-                return NotFound("Usuário não encontrado.");
-            }
-            return Ok(user);
+            _tokenRepository = tokenRepository;
         }
 
         /// <summary>
@@ -99,37 +75,37 @@ namespace api_server_users.Controllers
         }
 
         /// <summary>
-        /// Alterar usuários
+        /// Realizar login
         /// </summary>
+        /// <param name="email">Email</param>
+        /// <param name="password">Senha</param>
         /// <returns></returns>
-        [HttpPut("update")]
-        public ActionResult Update([FromBody]UserUpdateDTO userDTO)
+        [HttpPost("login")]
+        public ActionResult Login([Required]string email, [Required]string password)
         {
-            if (ModelState.IsValid)
+            var applicationUser = _userRepository.Get(email);
+
+            if (applicationUser == null)
             {
-                var user = _userRepository.Get(userDTO.Email);
-
-                if (user == null)
-                {
-                    return NotFound("Usuário não encontrado.");
-                }
-                {
-                    user.FullName = userDTO.Name;
-                    user.PhoneNumber = userDTO.PhoneNumber;
-                }
-
-                _userRepository.Update(user);
-
+                return NotFound("Usuário ou senha inválida.");
             }
 
-            return Ok("Usuário alterado com sucesso.");
+            if (!_userRepository.CheckPassword(applicationUser, password))
+            {
+                return NotFound("Usuário ou senha inválida.");
+            }
+
+            // Gera token
+            return Ok(GenerateToken(applicationUser));
+
         }
 
         /// <summary>
-        /// Alterar senha
+        /// Alterar senha - Necessário Token (obter no Login)
         /// </summary>
         /// <param name="userDTO">Modelo de input de alteração de senha</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPut("changePassword")]
         public ActionResult ChangePassword([FromBody]UserChangePasswordDTO userDTO)
         {
@@ -175,11 +151,75 @@ namespace api_server_users.Controllers
         }
 
         /// <summary>
-        /// Deletar usuário por e-mail
+        /// Alterar usuário - Necessário Token (obter no Login)
         /// </summary>
         /// <returns></returns>
+        [Authorize]
+        [HttpPut("update")]
+        public ActionResult Update([FromBody]UserUpdateDTO userDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = _userRepository.Get(userDTO.Email);
+
+                if (user == null)
+                {
+                    return NotFound("Usuário não encontrado.");
+                }
+                {
+                    user.FullName = userDTO.Name;
+                    user.PhoneNumber = userDTO.PhoneNumber;
+                }
+
+                _userRepository.Update(user);
+
+            }
+
+            return Ok("Usuário alterado com sucesso.");
+        }
+
+        /// <summary>
+        /// Obter usuário por e-mail - Necessário Token (obter no Login)
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("get")]
+        public ActionResult Get([Required]string email)
+        {
+            var user = _userRepository.Get(email);
+
+            if (user == null)
+            {
+                return NotFound("Usuário não encontrado.");
+            }
+            return Ok(user);
+        }
+
+        /// <summary>
+        /// Obter todos os usuários - Necessário Token (obter no Login)
+        /// </summary>
+        /// <returns>Usuários</returns>
+        [Authorize]
+        [HttpGet("getAll")]
+        public ActionResult Get()
+        {
+            var users = _userRepository.Get();
+
+            if (users.Count == 0)
+            {
+                return NotFound("Não existem usuários cadastrados.");
+            }
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// Deletar usuário por e-mail - Necessário Token (obter no Login)
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
         [HttpDelete("delete")]
-        public ActionResult Delete(string email)
+        public ActionResult Delete([Required]string email)
         {
             var user = _userRepository.Get(email);
 
@@ -191,6 +231,69 @@ namespace api_server_users.Controllers
             _userRepository.Delete(user);
 
             return Ok("Usuário deletado com sucesso.");
+        }
+
+        /// <summary>
+        /// Geração do token
+        /// </summary>
+        /// <param name="user">Objeto do usuário</param>
+        /// <returns></returns>
+        private TokenDTO BuildToken(ApplicationUser user)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("key-api-jwt-tasks"));
+            var sign = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var exp = DateTime.Now.AddHours(1);
+
+            JwtSecurityToken token = new JwtSecurityToken(issuer: null,
+                                                          audience: null,
+                                                          claims: claims,
+                                                          expires: exp,
+                                                          signingCredentials: sign);
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            var refreshToken = Guid.NewGuid().ToString().Replace("-", string.Empty);
+            var expRefreshToken = DateTime.Now.AddHours(2);
+
+            var tokenDTO = new TokenDTO
+            {
+                Token = tokenString,
+                Expiration = exp,
+                ExpirationRefreshToken = expRefreshToken,
+                RefreshToken = refreshToken
+            };
+
+            return tokenDTO;
+        }
+
+        /// <summary>
+        /// Gerar e cadastrar Token
+        /// </summary>
+        /// <param name="applicationUser"></param>
+        /// <returns></returns>
+        private ActionResult GenerateToken(ApplicationUser applicationUser)
+        {
+            var token = BuildToken(applicationUser);
+
+            var newToken = new Token()
+            {
+                RefreshToken = token.RefreshToken,
+                ExpirationToken = token.Expiration,
+                ExpirationRefreshToken = token.ExpirationRefreshToken,
+                User = applicationUser,
+                DateCreated = DateTime.Now,
+                Used = false
+            };
+
+            _tokenRepository.Add(newToken);
+
+            return Ok(token);
         }
     }
 }

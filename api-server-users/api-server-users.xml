@@ -9,23 +9,10 @@
             Controlador do usuário
             </summary>
         </member>
-        <member name="M:api_server_users.Controllers.UserController.#ctor(api_server_users.Repositories.Interfaces.IApplicationUserRepository)">
+        <member name="M:api_server_users.Controllers.UserController.#ctor(api_server_users.Repositories.Interfaces.IApplicationUserRepository,api_server_users.Repositories.Interfaces.ITokenRepository)">
             <summary>
             Construtor
             </summary>
-        </member>
-        <member name="M:api_server_users.Controllers.UserController.Get">
-            <summary>
-            Obter todos os usuários
-            </summary>
-            <returns>Usuários</returns>
-        </member>
-        <member name="M:api_server_users.Controllers.UserController.Get(System.String)">
-            <summary>
-            Obter usuário por e-mail
-            </summary>
-            <param name="email"></param>
-            <returns></returns>
         </member>
         <member name="M:api_server_users.Controllers.UserController.Add(api_server_users.Models.UserAddDTO)">
             <summary>
@@ -33,23 +20,58 @@
             </summary>
             <returns>Usuário</returns>
         </member>
-        <member name="M:api_server_users.Controllers.UserController.Update(api_server_users.Models.UserUpdateDTO)">
+        <member name="M:api_server_users.Controllers.UserController.Login(System.String,System.String)">
             <summary>
-            Alterar usuários
+            Realizar login
             </summary>
+            <param name="email">Email</param>
+            <param name="password">Senha</param>
             <returns></returns>
         </member>
         <member name="M:api_server_users.Controllers.UserController.ChangePassword(api_server_users.Models.UserChangePasswordDTO)">
             <summary>
-            Alterar senha
+            Alterar senha - Necessário Token (obter no Login)
             </summary>
             <param name="userDTO">Modelo de input de alteração de senha</param>
             <returns></returns>
         </member>
+        <member name="M:api_server_users.Controllers.UserController.Update(api_server_users.Models.UserUpdateDTO)">
+            <summary>
+            Alterar usuário - Necessário Token (obter no Login)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Controllers.UserController.Get(System.String)">
+            <summary>
+            Obter usuário por e-mail - Necessário Token (obter no Login)
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Controllers.UserController.Get">
+            <summary>
+            Obter todos os usuários - Necessário Token (obter no Login)
+            </summary>
+            <returns>Usuários</returns>
+        </member>
         <member name="M:api_server_users.Controllers.UserController.Delete(System.String)">
             <summary>
-            Deletar usuário por e-mail
+            Deletar usuário por e-mail - Necessário Token (obter no Login)
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Controllers.UserController.BuildToken(api_server_users.DataBase.Entities.ApplicationUser)">
+            <summary>
+            Geração do token
+            </summary>
+            <param name="user">Objeto do usuário</param>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Controllers.UserController.GenerateToken(api_server_users.DataBase.Entities.ApplicationUser)">
+            <summary>
+            Gerar e cadastrar Token
+            </summary>
+            <param name="applicationUser"></param>
             <returns></returns>
         </member>
         <member name="T:api_server_users.DataBase.Entities.ApplicationUser">
@@ -60,6 +82,61 @@
         <member name="P:api_server_users.DataBase.Entities.ApplicationUser.FullName">
             <summary>
             Nome completo do usuário
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.ApplicationUser.Tokens">
+            <summary>
+            Tokens do usuário
+            </summary>
+        </member>
+        <member name="T:api_server_users.DataBase.Entities.Token">
+            <summary>
+            Objeto do Token
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.Id">
+            <summary>
+            Identificador do Token
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.RefreshToken">
+            <summary>
+            Token atualizado
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.UserId">
+            <summary>
+            Identificador do usuário
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.User">
+            <summary>
+            Objeto do usuário
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.Used">
+            <summary>
+            Flag para indicar se o token foi utilizado ou não.
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.ExpirationToken">
+            <summary>
+            Data de expiração do token
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.ExpirationRefreshToken">
+            <summary>
+            Data de expiração do token atualizado
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.DateCreated">
+            <summary>
+            Data de criação do token
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.Entities.Token.DateModifield">
+            <summary>
+            Data de modificação do token
             </summary>
         </member>
         <member name="T:api_server_users.DataBase.UserContext">
@@ -76,6 +153,36 @@
         <member name="P:api_server_users.DataBase.UserContext.ApplicationUsers">
             <summary>
             Tabela ApplicationUsers
+            </summary>
+        </member>
+        <member name="P:api_server_users.DataBase.UserContext.Tokens">
+            <summary>
+            Tabela Tokens 
+            </summary>
+        </member>
+        <member name="T:api_server_users.Models.TokenDTO">
+            <summary>
+            Visualização do objeto Token
+            </summary>
+        </member>
+        <member name="P:api_server_users.Models.TokenDTO.Token">
+            <summary>
+            Token
+            </summary>
+        </member>
+        <member name="P:api_server_users.Models.TokenDTO.Expiration">
+            <summary>
+            Data de expiração
+            </summary>
+        </member>
+        <member name="P:api_server_users.Models.TokenDTO.RefreshToken">
+            <summary>
+            Data de renovação
+            </summary>
+        </member>
+        <member name="P:api_server_users.Models.TokenDTO.ExpirationRefreshToken">
+            <summary>
+            Data de expiração da renovação
             </summary>
         </member>
         <member name="T:api_server_users.Models.UserAddDTO">
@@ -264,10 +371,77 @@
             </summary>
             <param name="applicationUser">Objeto do usuário</param>
         </member>
+        <member name="T:api_server_users.Repositories.Interfaces.ITokenRepository">
+            <summary>
+            Interface do Repositório do Token
+            </summary>
+        </member>
+        <member name="M:api_server_users.Repositories.Interfaces.ITokenRepository.Add(api_server_users.DataBase.Entities.Token)">
+            <summary>
+            Cadastro do Token
+            </summary>
+            <param name="token">Objeto do token</param>
+        </member>
+        <member name="M:api_server_users.Repositories.Interfaces.ITokenRepository.Get(System.String)">
+            <summary>
+            Obter token
+            </summary>
+            <param name="refreshToken">Token renovado</param>
+            <returns></returns>
+        </member>
+        <member name="M:api_server_users.Repositories.Interfaces.ITokenRepository.Update(api_server_users.DataBase.Entities.Token)">
+            <summary>
+            Altarar token
+            </summary>
+            <param name="token">Objeto do Token</param>
+        </member>
+        <member name="T:api_server_users.Repositories.TokenRepository">
+            <summary>
+            Repositório do token
+            </summary>
+        </member>
+        <member name="M:api_server_users.Repositories.TokenRepository.#ctor(api_server_users.DataBase.UserContext)">
+            <summary>
+            Construtor
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:api_server_users.Repositories.TokenRepository.Add(api_server_users.DataBase.Entities.Token)">
+            <summary>
+            Cadastrar TOken
+            </summary>
+            <param name="token">Token</param>
+        </member>
+        <member name="M:api_server_users.Repositories.TokenRepository.Get(System.String)">
+            <summary>
+            Obter token
+            </summary>
+            <param name="refreshToken">Token Renovado</param>
+            <returns>Token Renovado</returns>
+        </member>
+        <member name="M:api_server_users.Repositories.TokenRepository.Update(api_server_users.DataBase.Entities.Token)">
+            <summary>
+            Alterar Token
+            </summary>
+            <param name="token">token</param>
+        </member>
         <member name="T:api_server_users.Startup">
             <summary>
             Classe de inicialização
             </summary>
+        </member>
+        <member name="M:api_server_users.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Classe de configuração de serviços
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:api_server_users.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            Classe de configuração
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
         </member>
     </members>
 </doc>

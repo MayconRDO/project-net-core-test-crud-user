@@ -23,5 +23,10 @@ namespace api_server_users.DataBase
         /// Tabela ApplicationUsers
         /// </summary>
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+
+        /// <summary>
+        /// Tabela Tokens 
+        /// </summary>
+        public DbSet<Token> Tokens { get; set; }
     }
 }
