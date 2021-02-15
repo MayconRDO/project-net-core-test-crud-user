@@ -40,14 +40,7 @@ namespace api_server_users.Repositories
         /// <returns></returns>
         public ApplicationUser Get(string email)
         {
-            var user = _userManager.FindByEmailAsync(email).Result;
-
-            if (user == null)
-            {
-                throw new Exception("Usuário não localizado!");
-            }
-
-            return user;
+            return _userManager.FindByEmailAsync(email).Result;
         }
 
         /// <summary>

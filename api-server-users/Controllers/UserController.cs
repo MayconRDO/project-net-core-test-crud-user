@@ -31,7 +31,13 @@ namespace api_server_users.Controllers
         [HttpGet("getAll")]
         public ActionResult Get()
         {
-            return Ok(_userRepository.Get());
+            var users = _userRepository.Get();
+
+            if (users.Count == 0)
+            {
+                return NotFound("Não existem usuários cadastrados.");
+            }
+            return Ok(users);
         }
 
         /// <summary>
@@ -42,7 +48,13 @@ namespace api_server_users.Controllers
         [HttpGet("get")]
         public ActionResult Get(string email)
         {
-            return Ok(_userRepository.Get(email));
+            var user = _userRepository.Get(email);
+
+            if (user == null)
+            {
+                return NotFound("Usuário não encontrado.");
+            }
+            return Ok(user);
         }
 
         /// <summary>
@@ -50,18 +62,19 @@ namespace api_server_users.Controllers
         /// </summary>
         /// <returns>Usuário</returns>
         [HttpPost("add")]
-        public ActionResult Add([FromBody]UserDTO user)
+        public ActionResult Add([FromBody]UserAddDTO userDTO)
         {
             if (ModelState.IsValid)
             {
                 ApplicationUser applicationUser = new ApplicationUser()
                 {
-                    FullName = user.Name,
-                    Email = user.Email,
-                    UserName = user.Email
+                    FullName = userDTO.Name,
+                    Email = userDTO.Email,
+                    UserName = userDTO.Email,
+                    PhoneNumber = userDTO.PhoneNumber
                 };
 
-                var result = _userRepository.Add(applicationUser, user.Password);
+                var result = _userRepository.Add(applicationUser, userDTO.Password);
 
                 if (!result.Succeeded)
                 {
@@ -90,15 +103,19 @@ namespace api_server_users.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("update")]
-        public ActionResult Update()
+        public ActionResult Update([FromBody]UserUpdateDTO userDTO)
         {
             if (ModelState.IsValid)
             {
-                var user = _userRepository.Get("maycon.oliveira@gmail.com");
+                var user = _userRepository.Get(userDTO.Email);
 
                 if (user == null)
                 {
                     return NotFound("Usuário não encontrado.");
+                }
+                {
+                    user.FullName = userDTO.Name;
+                    user.PhoneNumber = userDTO.PhoneNumber;
                 }
 
                 _userRepository.Update(user);

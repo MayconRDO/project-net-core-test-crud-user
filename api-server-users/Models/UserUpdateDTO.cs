@@ -7,16 +7,10 @@ using System.Threading.Tasks;
 namespace api_server_users.Models
 {
     /// <summary>
-    /// Objeto de visualização do usuário
+    /// View de update do objeto Usuário
     /// </summary>
-    public class UserDTO
+    public class UserUpdateDTO
     {
-        /// <summary>
-        /// Nome
-        /// </summary>
-        [Required]
-        public string Name { get; set; }
-        
         /// <summary>
         /// Email 
         /// </summary>
@@ -25,16 +19,15 @@ namespace api_server_users.Models
         public string Email { get; set; }
 
         /// <summary>
-        /// Senha
+        /// Nome
         /// </summary>
-        [Required]
-        public string Password { get; set; }
+        [Required(ErrorMessage = "O nome é obrigatório")]
+        public string Name { get; set; }
 
         /// <summary>
-        /// Confirmação de Senha
+        /// Número Telefone
         /// </summary>
-        [Required]
-        [Compare("Password")]
-        public string PasswordConfirmation { get; set; }
+        public string PhoneNumber { get; set; }
+
     }
 }

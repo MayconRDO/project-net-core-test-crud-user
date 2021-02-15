@@ -7,7 +7,7 @@ namespace api_server_users.DataBase
     /// <summary>
     /// Contexto do Usuário
     /// </summary>
-    public class UserContext : IdentityDbContext
+    public class UserContext : IdentityDbContext<ApplicationUser>
     {
         /// <summary>
         /// Construtor do usuário
@@ -19,5 +19,9 @@ namespace api_server_users.DataBase
         }
 
         // Aqui abaixo vão as demais tabelas....
+        /// <summary>
+        /// Tabela ApplicationUsers
+        /// </summary>
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     }
 }
