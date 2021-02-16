@@ -202,7 +202,7 @@ namespace api_server_users.Controllers
         /// <returns>Usuários</returns>
         [Authorize]
         [HttpGet("getAll")]
-        public ActionResult Get()
+        public ActionResult GetAll()
         {
             var users = _userRepository.Get();
 

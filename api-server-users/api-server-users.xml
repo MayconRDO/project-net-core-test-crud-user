@@ -48,7 +48,7 @@
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="M:api_server_users.Controllers.UserController.Get">
+        <member name="M:api_server_users.Controllers.UserController.GetAll">
             <summary>
             Obter todos os usuários - Necessário Token (obter no Login)
             </summary>
